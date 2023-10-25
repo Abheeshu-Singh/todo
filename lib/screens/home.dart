@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -28,9 +30,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 IconButton(
                   onPressed: () {},
-                  icon: Icon(
-                    Icons.sort,
-                    color: Colors.white,
+                  padding: EdgeInsets.all(0),
+                  icon: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                        color: Colors.grey.shade800.withOpacity(.8)),
+                    child: Icon(
+                      Icons.sort,
+                      color: Colors.white,
+                    ),
                   ),
                 )
               ],
