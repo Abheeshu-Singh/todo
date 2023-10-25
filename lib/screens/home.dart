@@ -71,8 +71,60 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
+              Expanded(
+                  child: Card(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                child: ListView(
+                  children: [
+                    ListTile(
+                      title: RichText(
+                        text: TextSpan(
+                          text: "Pagl Aadmi",
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                              height: 1.5),
+                          children: const [
+                            TextSpan(
+                              text: "koi ilaaz nahi",
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                  height: 1.5),
+                            )
+                          ],
+                        ),
+                      ),
+                      subtitle: Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Text(
+                          "Edited : 20/11/2023",
+                          style: TextStyle(
+                              fontSize: 10,
+                              fontStyle: FontStyle.italic,
+                              color: Colors.grey.shade800),
+                        ),
+                      ),
+                      trailing: IconButton(
+                          onPressed: () {}, icon: Icon(Icons.delete)),
+                    )
+                  ],
+                ),
+              ))
             ],
           ),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {},
+        elevation: 10,
+        backgroundColor: Colors.grey,
+        child: const Icon(
+          Icons.add,
+          size: 38,
         ),
       ),
     );
