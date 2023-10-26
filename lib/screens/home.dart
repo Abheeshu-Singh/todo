@@ -1,6 +1,11 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:todo_app/constants/constants.dart';
+import 'package:todo_app/modals/note.dart';
+import 'package:intl/intl.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -10,6 +15,11 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  getRandomColor() {
+    Random random = Random();
+    return backgroundColors[random.nextInt(backgroundColors.length)];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -71,49 +81,63 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
+              SizedBox(
+                height: 20,
+              ),
               Expanded(
-                  child: Card(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
-                child: ListView(
-                  children: [
-                    ListTile(
-                      title: RichText(
-                        text: TextSpan(
-                          text: "Pagl Aadmi",
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                              height: 1.5),
-                          children: const [
-                            TextSpan(
-                              text: "koi ilaaz nahi",
+                child: ListView.builder(
+                  padding: EdgeInsets.only(top: 30),
+                  itemCount: sampleNotes.length,
+                  itemBuilder: (context, index) {
+                    return Card(
+                      margin: EdgeInsets.only(bottom: 20),
+                      color: getRandomColor(),
+                      elevation: 3,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                      child: Padding(
+                        padding: EdgeInsets.all(10),
+                        child: ListTile(
+                          title: RichText(
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
+                            text: TextSpan(
+                              text: '${sampleNotes[index].title}\n',
                               style: TextStyle(
                                   color: Colors.black,
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 14,
+                                  fontSize: 18,
                                   height: 1.5),
-                            )
-                          ],
+                              children: [
+                                TextSpan(
+                                  text: sampleNotes[index].content,
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                      height: 1.5),
+                                )
+                              ],
+                            ),
+                          ),
+                          subtitle: Padding(
+                            padding: const EdgeInsets.only(top: 8),
+                            child: Text(
+                              "Edited: ${DateFormat().format(sampleNotes[index].modifiedTime)}",
+                              style: TextStyle(
+                                  fontSize: 10,
+                                  fontStyle: FontStyle.italic,
+                                  color: Colors.grey.shade800),
+                            ),
+                          ),
+                          trailing: IconButton(
+                              onPressed: () {}, icon: Icon(Icons.delete)),
                         ),
                       ),
-                      subtitle: Padding(
-                        padding: const EdgeInsets.only(top: 8),
-                        child: Text(
-                          "Edited : 20/11/2023",
-                          style: TextStyle(
-                              fontSize: 10,
-                              fontStyle: FontStyle.italic,
-                              color: Colors.grey.shade800),
-                        ),
-                      ),
-                      trailing: IconButton(
-                          onPressed: () {}, icon: Icon(Icons.delete)),
-                    )
-                  ],
+                    );
+                  },
                 ),
-              ))
+              )
             ],
           ),
         ),
