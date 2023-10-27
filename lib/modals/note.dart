@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 class Note {
   int id;
   String title;
@@ -22,7 +20,7 @@ List<Note> sampleNotes = [
   ),
   Note(
     id: 1,
-    title: 'chl nikl page',
+    title: 'chl nikl pagl',
     content: 'chutiya insan',
     modifiedTime: DateTime(2023, 01, 24, 11, 11),
   )

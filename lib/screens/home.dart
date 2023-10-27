@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:todo_app/constants/constants.dart';
 import 'package:todo_app/modals/note.dart';
 import 'package:intl/intl.dart';
+import 'package:todo_app/screens/edit.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,9 +16,47 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  List<Note> filteredNotes = [];
+  bool sorted = false;
+
+  @override
+  void initState() {
+    super.initState();
+    filteredNotes = sampleNotes;
+  }
+
+  List<Note> sortNotesByModifiedTime(List<Note> notes) {
+    if (sorted) {
+      notes.sort((a, b) => a.modifiedTime.compareTo(b.modifiedTime));
+    } else {
+      notes.sort((b, a) => a.modifiedTime.compareTo(b.modifiedTime));
+    }
+    sorted = !sorted;
+    return notes;
+  }
+
   getRandomColor() {
     Random random = Random();
     return backgroundColors[random.nextInt(backgroundColors.length)];
+  }
+
+  void onSearchTextChange(String searchText) {
+    setState(() {
+      filteredNotes = sampleNotes
+          .where((note) =>
+              note.content.toLowerCase().contains(searchText.toLowerCase()) ||
+              note.title.toLowerCase().contains(searchText.toLowerCase()))
+          .toList();
+    });
+  }
+
+  void deleteNote(int index) {
+    setState(() {
+      Note note = filteredNotes[index];
+      sampleNotes.remove(note);
+
+      filteredNotes.removeAt(index);
+    });
   }
 
   @override
@@ -40,7 +79,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      setState(() {
+                        filteredNotes = sortNotesByModifiedTime(filteredNotes);
+                      });
+                    },
                     padding: EdgeInsets.all(0),
                     icon: Container(
                       width: 40,
@@ -60,6 +103,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: 20,
               ),
               TextField(
+                onChanged: onSearchTextChange,
                 style: TextStyle(fontSize: 16, color: Colors.white),
                 decoration: InputDecoration(
                   contentPadding: EdgeInsets.symmetric(vertical: 12),
@@ -87,7 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Expanded(
                 child: ListView.builder(
                   padding: EdgeInsets.only(top: 30),
-                  itemCount: sampleNotes.length,
+                  itemCount: filteredNotes.length,
                   itemBuilder: (context, index) {
                     return Card(
                       margin: EdgeInsets.only(bottom: 20),
@@ -98,6 +142,32 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Padding(
                         padding: EdgeInsets.all(10),
                         child: ListTile(
+                          onTap: () async {
+                            final result = await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (BuildContext context) => EditScreen(
+                                  note: filteredNotes[index],
+                                ),
+                              ),
+                            );
+                            if (result != null) {
+                              setState(() {
+                                int originalIndex =
+                                    sampleNotes.indexOf(filteredNotes[index]);
+                                sampleNotes[originalIndex] = (Note(
+                                    id: sampleNotes[originalIndex].id,
+                                    title: result[0],
+                                    content: result[1],
+                                    modifiedTime: DateTime.now()));
+                                filteredNotes[index] = Note(
+                                    id: filteredNotes[index].id,
+                                    title: result[0],
+                                    content: result[1],
+                                    modifiedTime: DateTime.now());
+                              });
+                            }
+                          },
                           title: RichText(
                             maxLines: 3,
                             overflow: TextOverflow.ellipsis,
@@ -131,7 +201,13 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                           trailing: IconButton(
-                              onPressed: () {}, icon: Icon(Icons.delete)),
+                              onPressed: () async {
+                                final result = await confirmDialog(context);
+                                if (result != null && result) {
+                                  deleteNote(index);
+                                }
+                              },
+                              icon: Icon(Icons.delete)),
                         ),
                       ),
                     );
@@ -143,7 +219,24 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () async {
+          final result = await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (BuildContext context) => const EditScreen(),
+            ),
+          );
+          if (result != null) {
+            setState(() {
+              sampleNotes.add(Note(
+                  id: sampleNotes.length,
+                  title: result[0],
+                  content: result[1],
+                  modifiedTime: DateTime.now()));
+              filteredNotes = sampleNotes;
+            });
+          }
+        },
         elevation: 10,
         backgroundColor: Colors.grey,
         child: const Icon(
@@ -152,5 +245,56 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
     );
+  }
+
+  Future<dynamic> confirmDialog(BuildContext context) {
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            backgroundColor: Colors.grey.shade900,
+            icon: Icon(
+              Icons.info,
+              color: Colors.grey,
+            ),
+            title: Text(
+              "Do you want to delete it? ",
+              style: TextStyle(color: Colors.white),
+            ),
+            content: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context, true);
+                    },
+                    style:
+                        ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                    child: SizedBox(
+                      width: 60,
+                      child: Text(
+                        "Yes",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    )),
+                ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context, true);
+                    },
+                    style:
+                        ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                    child: SizedBox(
+                      width: 60,
+                      child: Text(
+                        "No",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ))
+              ],
+            ),
+          );
+        });
   }
 }
